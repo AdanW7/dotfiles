@@ -1,0 +1,12 @@
+[submodule "nvim/.config/nvim"]
+	path = nvim/.config/nvim
+	url = git@github.com:AdanW7/nvim.git
+[submodule "yazi/.config/yazi"]
+	path = yazi/.config/yazi
+	url = git@github.com:AdanW7/yazi.git
+[submodule "wezterm/.config/wezterm"]
+	path = wezterm/.config/wezterm
+	url = git@github.com:AdanW7/wezterm.git
+[submodule "Powershell/.config/powershell"]
+	path = Powershell/.config/powershell
+	url = git@github.com:AdanW7/Powershell.git
