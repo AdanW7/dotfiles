@@ -1,18 +1,56 @@
-# I have had some issues with clangd when trying to use iar as the expected compiler, until i can make it work i make clangd think we are using gcc
+# =============================================================================
+# clangd user config
+#
+# Layout:
+#   1. Universal      — applies to every file on every machine. Portable:
+#                       nothing toolchain-, path-, or repo-specific here.
+#   2. IAR / ARM      — applies only under the local IAR workspace root
+#                       (<...>/MTRepos/<...>). Makes clangd parse IAR (EWARM)
+#                       projects as GNU Arm while keeping the __ICCARM__ code
+#                       paths, and neutralizes IAR-only keywords/intrinsics.
+#   3. IAR / ARM C++  — C++ additions for that same workspace.
+#
+# Non-IAR work (open source, host tools, personal repos outside MTRepos) is
+# untouched and gets clangd's normal behavior. Per-project bits (device -mcpu,
+# predefined_symbols defines) live in each repo's own .clangd, not here.
+# =============================================================================
+
+# ---- 1. Universal -----------------------------------------------------------
 CompileFlags:
+  Add:
+    # Never stop indexing after N errors — keep building the full model.
+    - "-ferror-limit=0"
+
+SemanticTokens:
+  DisabledKinds: [InactiveCode]
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: Loose
+
+---
+# ---- 2. IAR / ARM workspace -------------------------------------------------
+# Gated on the workspace directory name so it never names an individual repo
+# and is a no-op on any machine that doesn't have that path.
+If:
+  PathMatch: ".*[/\\\\]MTRepos[/\\\\].*"
+
+CompileFlags:
+  # Parse as GNU Arm even though the real toolchain is IAR (ICCARM).
   Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-gcc.exe
 
   Remove:
+    # IAR preprocessing flag and its output-directory argument
     - "--preprocess=s"
     - "--mfc"
     - "*.dir"
+    # IAR diagnostics
     - "--diag_suppress"
-    - "--diag_suppress=Pe177"
-    - "Pe177"
-    - "--diag_suppress=Pe1444"
+    - "--diag_suppress=*"
     - "--silent"
     - "--no_path_in_file_macros"
     - "--warnings_are_errors"
+    # IAR code-gen / optimization flags (no clang equivalent needed for LSP)
     - "--cpu_mode=thumb"
     - "--no_cse"
     - "--no_unroll"
@@ -26,25 +64,39 @@ CompileFlags:
     - "--cpu=Cortex-M0+"
     - "--cpu=Cortex-M4"
     - "--fpu=VFPv4_sp"
+    - "--fpu=None"
     - "--char_is_unsigned"
     - "--c++"
     - "--no_rtti"
     - "--no_exceptions"
     - "--no_static_destruction"
-    - "-e"
-    - "--fpu=None"
-    - "-On"
     - "--use_c++_inline"
+    - "-e"
+    - "-On"
     # IAR standard-library config and its path argument
     - "--dlib_config"
     - "*/DLib_Config_Full.h"
-    # IAR preinclude and its path argument (defines injected via Add below)
+    # IAR preinclude and its path argument (both --preinclude=X and
+    # --preinclude X forms). Per-repo .clangd re-adds the equivalent -D defines.
     - "--preinclude=*"
+    - "--preinclude"
     - "*/predefined_symbols.h"
+
   Add:
-    - "-ferror-limit=0"
     - "--target=arm-none-eabi"
-    # gcc includes includes
+
+    # IAR-compatibility shim: neutralizes IAR extended keywords (__root,
+    # __no_init, __ramfunc, __intrinsic, ...) so IAR + CMSIS-IAR headers and
+    # firmware parse under clang. Must precede the IAR includes below.
+    - "-include"
+    - "C:/Users/awodzins/dotfiles/clangd/.config/clangd/iar_clangd_shim.h"
+
+    # Quiet IAR-only #pragmas that clang can't model (function_effects,
+    # language=extended, inline=forced, ...). They don't affect indexing.
+    - "-Wno-unknown-pragmas"
+    - "-Wno-ignored-pragmas"
+
+    # GNU Arm system includes
     - "-isystem"
     - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/lib/gcc/arm-none-eabi/14.2.1/include"
     - "-isystem"
@@ -52,7 +104,7 @@ CompileFlags:
     - "-isystem"
     - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include"
 
-    # iar includes
+    # IAR system includes (dlib, intrinsics, cmsis_iar, ...)
     - "-isystem"
     - "C:/iar/ewarm-9.60.4/arm/inc/c/aarch32"
     - "-isystem"
@@ -60,24 +112,18 @@ CompileFlags:
     - "-isystem"
     - "C:/iar/ewarm-9.60.4/arm/inc"
 
-    # iar defines
+    # IAR feature defines that gate #if branches in the code
     - "-D__ICCARM__"
     - "-D__ICCARM_INTRINSICS_VERSION__=2"
     - "-D__IAR_SYSTEMS_ICC__=9"
-    - "-D__WEAK"
     - "-D__ARRAY_OPERATORS"
-
-
-SemanticTokens:
-  DisabledKinds: [InactiveCode]
-
-Diagnostics:
-  ClangTidy:
-    FastCheckFilter: Loose
+    # NOTE: __WEAK is intentionally NOT defined here. It's an object-attribute in
+    # IAR/CMSIS headers; the shim neutralizes it. Defining it (=1) breaks parsing.
 
 ---
+# ---- 3. IAR / ARM workspace, C++ only ---------------------------------------
 If:
-  PathMatch: ".*\\.(cc|cp|cxx|cpp|c\\+\\+|hh|hpp|hxx)$"
+  PathMatch: ".*[/\\\\]MTRepos[/\\\\].*\\.(cc|cp|cxx|cpp|c\\+\\+|hh|hpp|hxx)$"
 
 CompileFlags:
   Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-g++.exe
@@ -90,20 +136,3 @@ CompileFlags:
     - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include/c++/14.2.1/arm-none-eabi"
     - "-isystem"
     - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include/c++/14.2.1/backward"
-
----
-If:
-  PathMatch: ".*[/\\\\]U-HILT[/\\\\].*"
-
-CompileFlags:
-  Add:
-    - "-include"
-    - "C:/MTRepos/U-HILT/src/EWARM/predefined_symbols.h"
-
----
-If:
-  PathMatch: ".*[/\\\\]PackToolComms2-M18-Demonstrator[/\\\\].*"
-CompileFlags:
-  Add:
-    - "-include"
-    - "C:/MTRepos/PackToolComms2-M18-Demonstrator/src/PredefineHeader/ReferenceDesign_Trap_STM32G0/predefined_symbols.h"
