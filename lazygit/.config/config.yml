@@ -1,0 +1,11 @@
+gui:
+  nerdFontsVersion: "3"
+  showPanelJumps: false
+  showRandomTip: false
+  showCommandLog: false
+  showDivergenceFromBaseBranch: arrowAndNumber
+
+git:
+  pagers:
+    - externalDiffCommand: "python ~/.config/lazygit/lazygit_pager.py"
+    - {}

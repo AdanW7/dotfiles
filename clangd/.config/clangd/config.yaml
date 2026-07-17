@@ -1,0 +1,109 @@
+# I have had some issues with clangd when trying to use iar as the expected compiler, until i can make it work i make clangd think we are using gcc
+CompileFlags:
+  Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-gcc.exe
+
+  Remove:
+    - "--preprocess=s"
+    - "--mfc"
+    - "*.dir"
+    - "--diag_suppress"
+    - "--diag_suppress=Pe177"
+    - "Pe177"
+    - "--diag_suppress=Pe1444"
+    - "--silent"
+    - "--no_path_in_file_macros"
+    - "--warnings_are_errors"
+    - "--cpu_mode=thumb"
+    - "--no_cse"
+    - "--no_unroll"
+    - "--no_inline"
+    - "--no_code_motion"
+    - "--no_tbaa"
+    - "--no_clustering"
+    - "--no_scheduling"
+    - "--debug"
+    - "--endian=little"
+    - "--cpu=Cortex-M0+"
+    - "--cpu=Cortex-M4"
+    - "--fpu=VFPv4_sp"
+    - "--char_is_unsigned"
+    - "--c++"
+    - "--no_rtti"
+    - "--no_exceptions"
+    - "--no_static_destruction"
+    - "-e"
+    - "--fpu=None"
+    - "-On"
+    - "--use_c++_inline"
+    # IAR standard-library config and its path argument
+    - "--dlib_config"
+    - "*/DLib_Config_Full.h"
+    # IAR preinclude and its path argument (defines injected via Add below)
+    - "--preinclude=*"
+    - "*/predefined_symbols.h"
+  Add:
+    - "-ferror-limit=0"
+    - "--target=arm-none-eabi"
+    # gcc includes includes
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/lib/gcc/arm-none-eabi/14.2.1/include"
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/lib/gcc/arm-none-eabi/14.2.1/include-fixed"
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include"
+
+    # iar includes
+    - "-isystem"
+    - "C:/iar/ewarm-9.60.4/arm/inc/c/aarch32"
+    - "-isystem"
+    - "C:/iar/ewarm-9.60.4/arm/inc/c"
+    - "-isystem"
+    - "C:/iar/ewarm-9.60.4/arm/inc"
+
+    # iar defines
+    - "-D__ICCARM__"
+    - "-D__ICCARM_INTRINSICS_VERSION__=2"
+    - "-D__IAR_SYSTEMS_ICC__=9"
+    - "-D__WEAK"
+    - "-D__ARRAY_OPERATORS"
+
+
+SemanticTokens:
+  DisabledKinds: [InactiveCode]
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: Loose
+
+---
+If:
+  PathMatch: ".*\\.(cc|cp|cxx|cpp|c\\+\\+|hh|hpp|hxx)$"
+
+CompileFlags:
+  Compiler: C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/bin/arm-none-eabi-g++.exe
+  Add:
+    - "-x"
+    - "c++"
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include/c++/14.2.1"
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include/c++/14.2.1/arm-none-eabi"
+    - "-isystem"
+    - "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.2 rel1/arm-none-eabi/include/c++/14.2.1/backward"
+
+---
+If:
+  PathMatch: ".*[/\\\\]U-HILT[/\\\\].*"
+
+CompileFlags:
+  Add:
+    - "-include"
+    - "C:/MTRepos/U-HILT/src/EWARM/predefined_symbols.h"
+
+---
+If:
+  PathMatch: ".*[/\\\\]PackToolComms2-M18-Demonstrator[/\\\\].*"
+CompileFlags:
+  Add:
+    - "-include"
+    - "C:/MTRepos/PackToolComms2-M18-Demonstrator/src/PredefineHeader/ReferenceDesign_Trap_STM32G0/predefined_symbols.h"
