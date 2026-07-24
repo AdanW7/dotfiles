@@ -44,6 +44,21 @@
 #ifndef __noreturn
 #define __noreturn
 #endif
+#ifndef __inline
+#define __inline
+#endif
+#ifndef __inline__
+#define __inline__
+#endif
+#ifndef __no_alloc
+#define __no_alloc
+#endif
+#ifndef __no_alloc16
+#define __no_alloc16
+#endif
+#ifndef __no_scratch
+#define __no_scratch
+#endif
 
 /*
  * IAR object / memory placement attributes that appear as declaration
@@ -64,6 +79,18 @@
 #endif
 #ifndef __absolute
 #define __absolute
+#endif
+#ifndef __code
+#define __code
+#endif
+#ifndef __data
+#define __data
+#endif
+#ifndef __out_of_image
+#define __out_of_image
+#endif
+#ifndef __ro_placement
+#define __ro_placement
 #endif
 #ifndef __stackless
 #define __stackless
@@ -89,6 +116,9 @@
  */
 #ifndef __packed
 #define __packed
+#endif
+#ifndef __naked
+#define __naked
 #endif
 #ifndef __arm
 #define __arm
@@ -142,6 +172,55 @@
  */
 #ifndef __constrange
 #define __constrange(lo, hi)
+#endif
+
+/* IAR parser builtins translated the same way as IAR's ClangdConfig.json. */
+#ifndef __ALIGNOF__
+#define __ALIGNOF__ __alignof__
+#endif
+#ifndef __typeof_
+#define __typeof_ __typeof__
+#endif
+#ifndef typeof
+#define typeof __typeof__
+#endif
+#ifndef __c99_generic
+#define __c99_generic(...)
+#endif
+#ifndef __iar_generic
+#define __iar_generic(...)
+#endif
+
+#ifndef __section_begin
+#define __section_begin(...) ((void *)0)
+#endif
+#ifndef __section_end
+#define __section_end(...) ((void *)0)
+#endif
+#ifndef __section_size
+#define __section_size(...) 0
+#endif
+#ifndef __segment_begin
+#define __segment_begin(...) ((void *)0)
+#endif
+#ifndef __segment_end
+#define __segment_end(...) ((void *)0)
+#endif
+#ifndef __segment_size
+#define __segment_size(...) 0
+#endif
+
+#ifndef __has_constructor
+#define __has_constructor __is_trivially_constructible
+#endif
+#ifndef __has_destructor
+#define __has_destructor __is_trivially_constructible
+#endif
+#ifndef __assignment_by_bitwise_copy_allowed
+#define __assignment_by_bitwise_copy_allowed(type) 1
+#endif
+#ifndef __construction_by_bitwise_copy_allowed
+#define __construction_by_bitwise_copy_allowed(type) 1
 #endif
 
 /*
