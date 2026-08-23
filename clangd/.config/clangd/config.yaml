@@ -46,6 +46,7 @@ CompileFlags:
     - "*.dir"
     # IAR diagnostics
     - "--diag_suppress"
+    - "--diag_error"
     - "--diag_suppress=*"
     - "--silent"
     - "--no_path_in_file_macros"
