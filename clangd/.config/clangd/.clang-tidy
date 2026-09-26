@@ -1,0 +1,19 @@
+Checks: [
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  cert-*
+  clang-analyzer-*
+  clang-diagnostic-*
+  cppcoreguidelines-*,
+  modernize-*,
+  -modernize-use-using,
+  misc-*
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-implicit-bool-conversion,
+  -readability-magic-numbers,
+  -readability-uppercase-literal-suffix,
+  google-*,
+]

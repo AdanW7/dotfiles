@@ -1,0 +1,87 @@
+---
+BasedOnStyle: Microsoft
+
+ColumnLimit: 120
+UseTab: Never # spaces are better than tabs
+
+IndentWidth: 4 # 4 space indenting is reasonable and consistent with code base
+BracedInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+IndentExternBlock: NoIndent
+IndentCaseLabels: false
+IndentCaseBlocks: true
+AccessModifierOffset: -4
+
+LineEnding: DeriveLF
+SortIncludes: Never
+ReflowComments: Never
+CommentPragmas: '^!'
+
+SkipMacroDefinitionBody: false
+
+PointerAlignment: Middle # Nick Brnot Prefers `Middle` but I believe that `Right` is correct per K&R
+
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+  AlignCompound: true
+
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+
+AlignEscapedNewlines: LeftWithLastLine
+AlignOperands: Align
+
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 2
+
+AllowAllArgumentsOnNextLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+# AllowShortRecordOnASingleLine: Empty # valid in clang-format23
+BitFieldColonSpacing: Both
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterUnion: true
+  AfterFunction: true
+  AfterStruct: true
+  AfterControlStatement: Always # While I would prefer `MultiLine`, `Always` is a better fit for the code base, more of an allman style
+  AfterClass: true
+  AfterNamespace: true
+
+  AfterExternBlock: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+BreakAdjacentStringLiterals: true
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterComma
+BreakBeforeBinaryOperators: NonAssignment # I very much like `NonAssignment`, but code base tends to prefer `None`
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: true
+
+Cpp11BracedListStyle: true
+SeparateDefinitionBlocks: Always
+
+FixNamespaceComments: true
+
+InsertNewlineAtEOF: true
+KeepEmptyLines:
+  AtEndOfFile: true
+StatementMacros: ["PRIVATE", "PROTECTED"]
+...
